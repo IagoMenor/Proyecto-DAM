@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import '../models/mascota_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -77,5 +78,27 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> consultarMascotas() async {
     Database db = await database;
     return await db.query('mascotas');
+  }
+
+// --- OPERACIONES PARA MASCOTAS ---
+  Future<int> actualizarMascota(Mascota mascota) async {
+    Database db = await database;
+    return await db.update('mascotas', mascota.toMap(), where: 'id = ?', whereArgs: [mascota.id]);
+  }
+
+  Future<int> eliminarMascota(int id) async {
+    Database db = await database;
+    return await db.delete('mascotas', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // --- OPERACIONES PARA CALENDARIO (Salud) ---
+  Future<int> insertarEvento(Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.insert('calendario', row);
+  }
+
+  Future<List<Map<String, dynamic>>> consultarEventosPorMascota(int mascotaId) async {
+    Database db = await database;
+    return await db.query('calendario', where: 'mascotaId = ?', whereArgs: [mascotaId], orderBy: 'fecha ASC');
   }
 }
